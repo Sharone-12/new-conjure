@@ -1137,8 +1137,7 @@ function Editor({ note, saveStatus, onTitleChange, onContentChange, onAddTag, on
 
         {/* Content — pulsing glow ring on autosave */}
         <div style={{
-          borderRadius:12, transition:"box-shadow .4s",
-          boxShadow: isSaving ? "0 0 0 2px rgba(124,58,237,.18), 0 0 24px rgba(124,58,237,.09)" : "none",
+          borderRadius:12,
         }}>
           <textarea
             ref={textareaRef}

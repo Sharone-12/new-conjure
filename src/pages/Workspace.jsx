@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import client from "../api/client";
+import Spinner from "../components/Spinner";
 
 const FONTS = `@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');`;
 
@@ -572,26 +573,16 @@ function AIPanel({ result, loading, error, onClose, onApplyTitle, onRetry }){
 
       <div style={{ padding:"20px 18px 32px", flex:1, display:"flex", flexDirection:"column", gap:14 }}>
 
-        {/* Loading skeleton */}
+        {/* Loading */}
         {loading && (
           <div style={{
             background:"linear-gradient(135deg,rgba(124,58,237,.06),rgba(168,85,247,.03))",
             border:"1px solid rgba(124,58,237,.14)",
-            borderRadius:20, padding:"24px",
+            borderRadius:20, padding:"40px 24px",
+            display:"flex", flexDirection:"column", alignItems:"center", gap:18,
           }}>
-            {[88,72,80,60,68].map((w,i)=>(
-              <div key={i} style={{
-                height:12, borderRadius:8, background:"rgba(124,58,237,.1)",
-                marginBottom:12, width:`${w}%`,
-                animation:`pulse 1.4s ${i*.14}s ease-in-out infinite`,
-              }}/>
-            ))}
-            <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, marginTop:22 }}>
-              <span style={{ width:7, height:7, borderRadius:"50%", background:C.violet, display:"inline-block", animation:"pulse 1s 0s ease-in-out infinite" }}/>
-              <span style={{ width:7, height:7, borderRadius:"50%", background:C.violet, display:"inline-block", animation:"pulse 1s .2s ease-in-out infinite" }}/>
-              <span style={{ width:7, height:7, borderRadius:"50%", background:C.violet, display:"inline-block", animation:"pulse 1s .4s ease-in-out infinite" }}/>
-              <span style={{ fontSize:13, color:"rgba(124,58,237,.65)", fontWeight:600, marginLeft:4 }}>Conjure is thinking…</span>
-            </div>
+            <Spinner size={36}/>
+            <span style={{ fontSize:13, color:"rgba(124,58,237,.65)", fontWeight:600 }}>Conjure is thinking…</span>
           </div>
         )}
 

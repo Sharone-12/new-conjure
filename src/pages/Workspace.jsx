@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import client from "../api/client";
 import Spinner from "../components/Spinner";
+import { jsPDF } from "jspdf";
 
 const FONTS = `@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');`;
 
@@ -74,6 +75,7 @@ const I = {
   plus:    <><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></>,
   chevron: <><path d="M6 9l6 6 6-6"/></>,
   menu:    <><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></>,
+  download:<><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></>,
 };
 
 /* ── Toasts ─────────────────────────────────────────────────────────────────── */
@@ -953,6 +955,52 @@ function Editor({ note, saveStatus, onTitleChange, onContentChange, onAddTag, on
   const [aiAction,setAiAction]=useState(null);
   const textareaRef=useRef(null);
 
+  function handleExportPDF(){
+    if(!note) return;
+    const doc = new jsPDF({ unit:"pt", format:"a4" });
+    const pageW = doc.internal.pageSize.getWidth();
+    const margin = 56;
+    const maxW = pageW - margin * 2;
+    let y = 72;
+
+    // Title
+    doc.setFont("helvetica","bold");
+    doc.setFontSize(24);
+    doc.setTextColor(12,10,30);
+    const titleLines = doc.splitTextToSize(note.title||"Untitled",maxW);
+    doc.text(titleLines, margin, y);
+    y += titleLines.length * 28 + 8;
+
+    // Tags
+    if((note.tags||[]).length>0){
+      doc.setFont("helvetica","normal");
+      doc.setFontSize(10);
+      doc.setTextColor(124,58,237);
+      doc.text((note.tags||[]).map(t=>`#${t}`).join("  "), margin, y);
+      y += 20;
+    }
+
+    // Divider
+    doc.setDrawColor(220,220,235);
+    doc.line(margin, y, pageW-margin, y);
+    y += 24;
+
+    // Content
+    doc.setFont("helvetica","normal");
+    doc.setFontSize(12);
+    doc.setTextColor(50,48,70);
+    const lines = doc.splitTextToSize(note.content||"", maxW);
+    const lineH = 18;
+    const pageH = doc.internal.pageSize.getHeight();
+    lines.forEach(line=>{
+      if(y + lineH > pageH - margin){ doc.addPage(); y = margin; }
+      doc.text(line, margin, y);
+      y += lineH;
+    });
+
+    doc.save(`${note.title||"note"}.pdf`);
+  }
+
   function handleMouseUp(e){
     const ta=textareaRef.current; if(!ta||!note) return;
     const start=ta.selectionStart, end=ta.selectionEnd;
@@ -1057,6 +1105,22 @@ function Editor({ note, saveStatus, onTitleChange, onContentChange, onAddTag, on
           }}>
             <Ic size={13} stroke="currentColor" sw={2}>{shareStatus==="shared"?I.check:I.share}</Ic>
             {shareStatus==="shared"?"Shared":"Share"}
+          </button>
+
+          {/* Export PDF */}
+          <button onClick={handleExportPDF} title="Export to PDF" style={{
+            display:"flex", alignItems:"center", gap:5,
+            padding:"7px 14px", borderRadius:100,
+            background:"rgba(255,255,255,.6)", border:"1px solid rgba(255,255,255,.82)",
+            color:"rgba(12,10,30,.45)",
+            fontFamily:"'DM Sans',sans-serif",
+            fontSize:12.5, fontWeight:600, cursor:"pointer", transition:"all .18s",
+          }}
+            onMouseEnter={e=>{ e.currentTarget.style.background="rgba(124,58,237,.07)"; e.currentTarget.style.borderColor="rgba(124,58,237,.22)"; e.currentTarget.style.color=C.violet; }}
+            onMouseLeave={e=>{ e.currentTarget.style.background="rgba(255,255,255,.6)"; e.currentTarget.style.borderColor="rgba(255,255,255,.82)"; e.currentTarget.style.color="rgba(12,10,30,.45)"; }}
+          >
+            <Ic size={13} stroke="currentColor" sw={2}>{I.download}</Ic>
+            PDF
           </button>
 
           {/* Archive */}

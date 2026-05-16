@@ -9,7 +9,7 @@ import {
 
 /* ─── fonts ──────────────────────────────────────────────────────────────────── */
 const FONTS = `
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
 `;
 
 /* ─── tokens ─────────────────────────────────────────────────────────────────── */
@@ -267,7 +267,7 @@ function StatCard({ icon, iconBg, iconColor, value, label, trend, trendColor, de
       ) : (
         <>
           <div style={{
-            fontFamily:"'Syne',sans-serif", fontSize:40, fontWeight:800,
+            fontFamily:"'DM Sans',sans-serif", fontSize:40, fontWeight:800,
             color:C.dark, lineHeight:1, letterSpacing:"-.05em", marginBottom:6,
           }}>{counted.toLocaleString()}</div>
           <div style={{ fontSize:13, color:C.muted, fontWeight:500, marginBottom:12 }}>{label}</div>
@@ -362,15 +362,13 @@ export default function Dashboard(){
             }}>
               {/* tint */}
               <div style={{ position:"absolute", inset:0, background:"rgba(238,232,255,.18)", pointerEvents:"none" }}/>
-              {/* bottom fade into page bg */}
-              <div style={{ position:"absolute", bottom:0, left:0, right:0, height:60, background:"linear-gradient(to bottom,transparent,#eef2ff)", pointerEvents:"none" }}/>
 
               <div style={{
                 position:"relative", zIndex:1,
                 padding:"44px 48px",
                 display:"flex", alignItems:"center", justifyContent:"space-between", gap:24,
               }}>
-                {/* Glass card over the image */}
+                {/* Greeting card */}
                 <div style={{
                   background:"rgba(255,255,255,.58)",
                   backdropFilter:"blur(28px) saturate(200%)",
@@ -424,7 +422,7 @@ export default function Dashboard(){
                 iconBg="rgba(245,158,11,.1)" iconColor="#d97706"
                 value={data?.ai_summaries_generated||0}
                 label="AI summaries"
-                trend="Powered by Groq"
+                trend=""
                 trendColor={C.violet}
               />
               <StatCard
@@ -624,7 +622,7 @@ export default function Dashboard(){
                 {/* Big center stat */}
                 <div style={{ textAlign:"center", padding:"28px 0 24px", flex:1 }}>
                   <div style={{
-                    fontFamily:"'Syne',sans-serif", fontSize:72, fontWeight:800,
+                    fontFamily:"'DM Sans',sans-serif", fontSize:72, fontWeight:800,
                     color:C.violet, lineHeight:1, letterSpacing:"-.05em", marginBottom:8,
                   }}>
                     {loading ? (
@@ -651,7 +649,7 @@ export default function Dashboard(){
                       {loading ? (
                         <Skeleton h={24} w="50%" r={6} style={{ margin:"0 auto 6px" }}/>
                       ) : (
-                        <div style={{ fontFamily:"'Syne',sans-serif", fontSize:24, fontWeight:800, color:s.color, marginBottom:4 }}>{s.value}</div>
+                        <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:24, fontWeight:800, color:s.color, marginBottom:4 }}>{s.value}</div>
                       )}
                       <div style={{ fontSize:11, color:C.muted, fontWeight:500 }}>{s.label}</div>
                     </div>
@@ -665,7 +663,7 @@ export default function Dashboard(){
                     padding:"7px 16px", borderRadius:100,
                     background:"rgba(124,58,237,.08)", border:"1px solid rgba(124,58,237,.18)",
                     fontSize:12, fontWeight:700, color:C.violet,
-                  }}>✦ Powered by Groq AI</span>
+                  }}>✦ AI Assistant</span>
                 </div>
               </div>
             </div>
@@ -686,7 +684,7 @@ export default function Dashboard(){
                 </div>
                 <div style={{ display:"flex", alignItems:"baseline", gap:6, marginBottom:12 }}>
                   <span style={{
-                    fontFamily:"'Syne',sans-serif", fontSize:80, fontWeight:800,
+                    fontFamily:"'DM Sans',sans-serif", fontSize:80, fontWeight:800,
                     color:"#fff", lineHeight:1, letterSpacing:"-.05em",
                   }}>{loading ? "—" : scoreCount}</span>
                   <span style={{ fontSize:28, fontWeight:700, color:"rgba(255,255,255,.45)", letterSpacing:"-.02em" }}>/100</span>

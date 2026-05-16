@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import client from "../api/client";
 
-const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');`;
+const FONTS = `@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');`;
 
 const C = {
   dark:    "#0c0a1e",
@@ -173,7 +173,7 @@ function Sidebar({ user, notes, showArchived, setShowArchived, activeTag, setAct
           background:"none", border:"none", cursor:"pointer", padding:0,
         }}>
           <span style={{ color:C.violet, fontSize:15, fontWeight:800 }}>✦</span>
-          <span style={{ fontWeight:800, fontSize:15.5, color:C.dark, letterSpacing:"-.03em", fontFamily:"'Syne',sans-serif" }}>Conjure</span>
+          <span style={{ fontWeight:800, fontSize:15.5, color:C.dark, letterSpacing:"-.03em", fontFamily:"'DM Sans',sans-serif" }}>Conjure</span>
         </button>
 
         {user && (
@@ -555,7 +555,7 @@ function AIPanel({ result, loading, error, onClose, onApplyTitle, onRetry }){
           </div>
           <div>
             <div style={{ fontWeight:800, fontSize:14, color:C.dark, letterSpacing:"-.02em" }}>AI Assistant</div>
-            <div style={{ fontSize:11, color:"rgba(124,58,237,.6)", fontWeight:500, marginTop:1 }}>Powered by Conjure</div>
+            <div style={{ fontSize:11, color:"rgba(124,58,237,.6)", fontWeight:500, marginTop:1 }}>AI Assistant</div>
           </div>
         </div>
         <button onClick={onClose} style={{
@@ -756,7 +756,7 @@ function EmptyEditor({ user, notes, onNewNote }){
           </div>
 
           <h2 style={{
-            fontFamily:"'Syne',sans-serif",
+            fontFamily:"'DM Sans',sans-serif",
             fontSize:24, fontWeight:800, color:C.dark,
             letterSpacing:"-.04em", marginBottom:10, lineHeight:1.2,
           }}>
@@ -1102,7 +1102,7 @@ function Editor({ note, saveStatus, onTitleChange, onContentChange, onAddTag, on
           style={{
             width:"100%", fontSize:34, fontWeight:800, color:C.dark,
             border:"none", outline:"none", background:"transparent",
-            fontFamily:"'Syne',sans-serif",
+            fontFamily:"'DM Sans',sans-serif",
             letterSpacing:"-.05em", marginBottom:20, lineHeight:1.15,
             boxSizing:"border-box",
           }}

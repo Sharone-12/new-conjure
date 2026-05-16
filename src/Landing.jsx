@@ -624,6 +624,7 @@ export default function Landing() {
         backgroundImage: "url('/landing.png')",
         backgroundSize: "cover",
         backgroundPosition: "center top",
+        backgroundColor: "#c8d8f0",
       }}>
         {/* barely-there tint */}
         <div style={{

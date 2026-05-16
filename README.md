@@ -261,8 +261,6 @@ Makes a note public and returns a shareable link UUID.
 
 ## Screenshots
 
-> Add screenshots to a `screenshots/` folder and reference them here.
-
 | Landing | Workspace | Dashboard |
 |---|---|---|
 | ![Landing](screenshots/landing.png) | ![Workspace](screenshots/workspace.png) | ![Dashboard](screenshots/dashboard.png) |

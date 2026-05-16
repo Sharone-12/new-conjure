@@ -327,9 +327,19 @@ def generate_quiz(
             messages=[{"role": "user", "content": prompt}],
         )
         raw = msg.choices[0].message.content.strip()
-        if raw.startswith("```"):
+        # Strip markdown code fences
+        if "```" in raw:
             parts = raw.split("```")
-            raw = parts[1][4:] if parts[1].startswith("json") else parts[1]
+            for part in parts:
+                candidate = part[4:].strip() if part.startswith("json") else part.strip()
+                if candidate.startswith("["):
+                    raw = candidate
+                    break
+        # Find the JSON array even if surrounded by extra text
+        start = raw.find("[")
+        end = raw.rfind("]")
+        if start != -1 and end != -1:
+            raw = raw[start:end+1]
         questions = json.loads(raw.strip())
         if not isinstance(questions, list) or len(questions) == 0:
             raise ValueError("Expected a list of questions")

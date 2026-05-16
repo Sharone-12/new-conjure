@@ -722,6 +722,244 @@ function AIPanel({ result, loading, error, onClose, onApplyTitle, onRetry }){
   );
 }
 
+/* ── Quiz Panel ──────────────────────────────────────────────────────────────── */
+function QuizPanel({ questions, loading, error, onClose, onRetry }){
+  const [idx,setIdx]         = useState(0);
+  const [picked,setPicked]   = useState(null);
+  const [scores,setScores]   = useState([]);
+  const [done,setDone]       = useState(false);
+
+  function choose(optIdx){
+    if(picked!==null) return;
+    const correct = questions[idx].answer === optIdx;
+    setPicked(optIdx);
+    setScores(p=>[...p, correct ? 1 : 0]);
+  }
+
+  function next(){
+    if(idx+1 >= questions.length){ setDone(true); return; }
+    setIdx(p=>p+1);
+    setPicked(null);
+  }
+
+  function restart(){
+    setIdx(0); setPicked(null); setScores([]); setDone(false);
+  }
+
+  const q = questions?.[idx];
+  const totalScore = scores.reduce((a,b)=>a+b,0);
+
+  return(
+    <div style={{
+      width:380, minWidth:380, flexShrink:0, height:"100vh", overflowY:"auto",
+      background:"rgba(255,255,255,.62)",
+      backdropFilter:"blur(28px) saturate(180%)",
+      WebkitBackdropFilter:"blur(28px) saturate(180%)",
+      borderLeft:"3px solid transparent",
+      backgroundClip:"padding-box",
+      display:"flex", flexDirection:"column",
+      fontFamily:"'DM Sans',sans-serif",
+      position:"relative", zIndex:1,
+    }}>
+      <div style={{
+        position:"absolute", left:0, top:0, bottom:0, width:3, zIndex:10,
+        background:"linear-gradient(180deg,#7c3aed 0%,#a855f7 50%,rgba(168,85,247,.3) 100%)",
+        pointerEvents:"none",
+      }}/>
+
+      {/* Header */}
+      <div style={{
+        padding:"22px 22px 18px",
+        borderBottom:"1px solid rgba(12,10,30,.06)",
+        display:"flex", alignItems:"center", justifyContent:"space-between",
+        position:"sticky", top:0,
+        background:"rgba(255,255,255,.82)", backdropFilter:"blur(20px)", zIndex:2,
+      }}>
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <div style={{
+            width:36, height:36, borderRadius:12,
+            background:"linear-gradient(135deg,#7c3aed,#a855f7)",
+            display:"flex", alignItems:"center", justifyContent:"center",
+            boxShadow:"0 6px 18px rgba(124,58,237,.35)",
+          }}>
+            <svg width="16" height="16" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <div>
+            <div style={{ fontWeight:800, fontSize:14, color:C.dark, letterSpacing:"-.02em" }}>Quiz Me</div>
+            {!done && questions && <div style={{ fontSize:11, color:"rgba(124,58,237,.6)", fontWeight:500, marginTop:1 }}>Question {idx+1} of {questions.length}</div>}
+          </div>
+        </div>
+        <button onClick={onClose} style={{
+          width:30, height:30, borderRadius:8,
+          background:"rgba(12,10,30,.05)", border:"1px solid rgba(12,10,30,.07)",
+          cursor:"pointer", color:"rgba(12,10,30,.35)",
+          display:"flex", alignItems:"center", justifyContent:"center",
+          fontSize:16, lineHeight:1, transition:"all .15s",
+        }}
+          onMouseEnter={e=>{ e.currentTarget.style.background="rgba(239,68,68,.08)"; e.currentTarget.style.color="#ef4444"; }}
+          onMouseLeave={e=>{ e.currentTarget.style.background="rgba(12,10,30,.05)"; e.currentTarget.style.color="rgba(12,10,30,.35)"; }}
+        >✕</button>
+      </div>
+
+      <div style={{ padding:"20px 18px 32px", flex:1, display:"flex", flexDirection:"column", gap:14 }}>
+
+        {/* Loading */}
+        {loading && (
+          <div style={{
+            background:"linear-gradient(135deg,rgba(124,58,237,.06),rgba(168,85,247,.03))",
+            border:"1px solid rgba(124,58,237,.14)",
+            borderRadius:20, padding:"40px 24px",
+            display:"flex", flexDirection:"column", alignItems:"center", gap:18,
+          }}>
+            <Spinner size={36}/>
+            <span style={{ fontSize:13, color:"rgba(124,58,237,.65)", fontWeight:600 }}>Conjure is thinking…</span>
+          </div>
+        )}
+
+        {/* Error */}
+        {error && !loading && (
+          <div style={{
+            background:"rgba(254,242,242,.9)", border:"1px solid rgba(239,68,68,.2)",
+            borderRadius:16, padding:"20px 20px 16px",
+            color:"#dc2626", fontSize:13.5, textAlign:"center", lineHeight:1.65,
+          }}>
+            {error}
+            <button onClick={onRetry} style={{
+              marginTop:14, display:"block", width:"100%",
+              padding:"9px 16px", borderRadius:100, border:"none",
+              background:"#ef4444", color:"#fff",
+              fontFamily:"'DM Sans',sans-serif",
+              fontSize:13, fontWeight:700, cursor:"pointer",
+              boxShadow:"0 4px 12px rgba(239,68,68,.3)", transition:"box-shadow .18s, transform .15s",
+            }}
+              onMouseEnter={e=>{ e.currentTarget.style.boxShadow="0 6px 18px rgba(239,68,68,.4)"; e.currentTarget.style.transform="translateY(-1px)"; }}
+              onMouseLeave={e=>{ e.currentTarget.style.boxShadow="0 4px 12px rgba(239,68,68,.3)"; e.currentTarget.style.transform="none"; }}
+            >Try again</button>
+          </div>
+        )}
+
+        {/* Done — score screen */}
+        {done && !loading && (
+          <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+            <div style={{
+              background:"linear-gradient(135deg,rgba(124,58,237,.08),rgba(168,85,247,.04))",
+              border:"1px solid rgba(124,58,237,.18)",
+              borderRadius:20, padding:"36px 24px", textAlign:"center",
+            }}>
+              <div style={{ fontSize:48, marginBottom:8 }}>
+                {totalScore === questions.length ? "🏆" : totalScore >= questions.length/2 ? "⭐" : "📖"}
+              </div>
+              <div style={{ fontSize:36, fontWeight:800, color:C.dark, letterSpacing:"-.04em" }}>
+                {totalScore}/{questions.length}
+              </div>
+              <div style={{ fontSize:14, color:"rgba(12,10,30,.5)", marginTop:6, fontWeight:500 }}>
+                {totalScore === questions.length ? "Perfect score!" : totalScore >= questions.length/2 ? "Good job!" : "Keep studying!"}
+              </div>
+            </div>
+            <button onClick={restart} style={{
+              width:"100%", padding:"13px 20px", borderRadius:100, border:"none",
+              background:"linear-gradient(135deg,#7c3aed,#a855f7)", color:"#fff",
+              fontFamily:"'DM Sans',sans-serif",
+              fontSize:14, fontWeight:700, cursor:"pointer",
+              boxShadow:"0 6px 20px rgba(124,58,237,.38)", transition:"box-shadow .2s, transform .15s",
+            }}
+              onMouseEnter={e=>{ e.currentTarget.style.boxShadow="0 10px 28px rgba(124,58,237,.48)"; e.currentTarget.style.transform="translateY(-1px)"; }}
+              onMouseLeave={e=>{ e.currentTarget.style.boxShadow="0 6px 20px rgba(124,58,237,.38)"; e.currentTarget.style.transform="none"; }}
+            >Try again</button>
+          </div>
+        )}
+
+        {/* Question */}
+        {!loading && !error && !done && q && (
+          <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+            {/* Progress bar */}
+            <div style={{ height:3, borderRadius:4, background:"rgba(124,58,237,.1)", overflow:"hidden" }}>
+              <div style={{
+                height:"100%", borderRadius:4,
+                background:"linear-gradient(90deg,#7c3aed,#a855f7)",
+                width:`${((idx) / questions.length) * 100}%`,
+                transition:"width .4s ease",
+              }}/>
+            </div>
+
+            {/* Question card */}
+            <div style={{
+              background:"linear-gradient(135deg,rgba(124,58,237,.06),rgba(168,85,247,.03))",
+              border:"1px solid rgba(124,58,237,.14)",
+              borderRadius:18, padding:"20px 18px",
+            }}>
+              <p style={{ fontSize:14.5, fontWeight:700, color:C.dark, lineHeight:1.7, margin:0 }}>
+                {q.question}
+              </p>
+            </div>
+
+            {/* Options */}
+            <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+              {q.options.map((opt, oi)=>{
+                const isCorrect = oi === q.answer;
+                const isPicked  = oi === picked;
+                let bg = "rgba(255,255,255,.6)";
+                let border = "1px solid rgba(255,255,255,.82)";
+                let color = C.dark;
+                if(picked !== null){
+                  if(isCorrect){ bg="rgba(22,163,74,.08)"; border="1px solid rgba(22,163,74,.28)"; color="#15803d"; }
+                  else if(isPicked){ bg="rgba(239,68,68,.08)"; border="1px solid rgba(239,68,68,.28)"; color="#dc2626"; }
+                }
+                return(
+                  <button key={oi} onClick={()=>choose(oi)} style={{
+                    width:"100%", textAlign:"left", padding:"13px 16px",
+                    borderRadius:14, border, background: bg, color,
+                    fontFamily:"'DM Sans',sans-serif",
+                    fontSize:13.5, fontWeight: picked!==null && isCorrect ? 700 : 500,
+                    cursor: picked!==null ? "default" : "pointer",
+                    transition:"all .18s", display:"flex", alignItems:"center", gap:10,
+                  }}>
+                    <span style={{
+                      width:22, height:22, borderRadius:7, flexShrink:0,
+                      border: picked!==null && isCorrect ? "1.5px solid #16a34a" : picked!==null && isPicked ? "1.5px solid #ef4444" : "1.5px solid rgba(12,10,30,.15)",
+                      background: picked!==null && isCorrect ? "rgba(22,163,74,.15)" : picked!==null && isPicked ? "rgba(239,68,68,.12)" : "rgba(255,255,255,.8)",
+                      display:"flex", alignItems:"center", justifyContent:"center",
+                      fontSize:10, fontWeight:800,
+                    }}>
+                      {picked!==null && isCorrect ? "✓" : picked!==null && isPicked ? "✕" : String.fromCharCode(65+oi)}
+                    </span>
+                    {opt}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Explanation + Next */}
+            {picked !== null && (
+              <div style={{ display:"flex", flexDirection:"column", gap:10, marginTop:2 }}>
+                <div style={{
+                  background:"rgba(255,255,255,.55)", border:"1px solid rgba(255,255,255,.85)",
+                  borderRadius:14, padding:"14px 16px",
+                  fontSize:13, color:"rgba(12,10,30,.6)", lineHeight:1.65,
+                }}>
+                  <span style={{ fontWeight:700, color:C.violet }}>Why: </span>{q.explanation}
+                </div>
+                <button onClick={next} style={{
+                  width:"100%", padding:"12px 20px", borderRadius:100, border:"none",
+                  background:"linear-gradient(135deg,#7c3aed,#a855f7)", color:"#fff",
+                  fontFamily:"'DM Sans',sans-serif",
+                  fontSize:14, fontWeight:700, cursor:"pointer",
+                  boxShadow:"0 6px 20px rgba(124,58,237,.35)", transition:"box-shadow .2s, transform .15s",
+                }}
+                  onMouseEnter={e=>{ e.currentTarget.style.boxShadow="0 10px 28px rgba(124,58,237,.45)"; e.currentTarget.style.transform="translateY(-1px)"; }}
+                  onMouseLeave={e=>{ e.currentTarget.style.boxShadow="0 6px 20px rgba(124,58,237,.35)"; e.currentTarget.style.transform="none"; }}
+                >{idx+1 >= questions.length ? "See results →" : "Next question →"}</button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /* ── Empty State ─────────────────────────────────────────────────────────────── */
 function EmptyEditor({ user, notes, onNewNote }){
   const totalTags=[...new Set(notes.flatMap(n=>n.tags||[]))].length;
@@ -949,7 +1187,7 @@ function SelectionPopover({ sel, aiAction, onAction, onReplace, onAddTasks, onDi
 }
 
 /* ── Editor ──────────────────────────────────────────────────────────────────── */
-function Editor({ note, saveStatus, onTitleChange, onContentChange, onAddTag, onRemoveTag, onArchive, onDelete, onShare, onSummarize, shareStatus, showArchived, user, notes, onNewNote }){
+function Editor({ note, saveStatus, onTitleChange, onContentChange, onAddTag, onRemoveTag, onArchive, onDelete, onShare, onSummarize, onQuiz, shareStatus, showArchived, user, notes, onNewNote }){
   const [tagInput,setTagInput]=useState("");
   const [sel,setSel]=useState(null);
   const [aiAction,setAiAction]=useState(null);
@@ -1091,6 +1329,25 @@ function Editor({ note, saveStatus, onTitleChange, onContentChange, onAddTag, on
             onMouseLeave={e=>{ e.currentTarget.style.background="rgba(124,58,237,.08)"; }}
           >
             <span style={{ fontSize:11 }}>✦</span> Summarize
+          </button>
+
+          {/* Quiz Me */}
+          <button onClick={onQuiz} style={{
+            display:"flex", alignItems:"center", gap:6,
+            padding:"7px 16px", borderRadius:100,
+            background:"rgba(124,58,237,.08)", border:"1px solid rgba(124,58,237,.2)",
+            color:C.violet,
+            fontFamily:"'DM Sans',sans-serif",
+            fontSize:12.5, fontWeight:700, cursor:"pointer",
+            transition:"all .18s",
+          }}
+            onMouseEnter={e=>{ e.currentTarget.style.background="rgba(124,58,237,.14)"; }}
+            onMouseLeave={e=>{ e.currentTarget.style.background="rgba(124,58,237,.08)"; }}
+          >
+            <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            Quiz me
           </button>
 
           {/* Share */}
@@ -1280,6 +1537,11 @@ export default function Workspace(){
   const [aiLoading,setAiLoading]           = useState(false);
   const [aiError,setAiError]               = useState(null);
 
+  const [isQuizOpen,setIsQuizOpen]         = useState(false);
+  const [quizQuestions,setQuizQuestions]   = useState(null);
+  const [quizLoading,setQuizLoading]       = useState(false);
+  const [quizError,setQuizError]           = useState(null);
+
   const [shareStatus,setShareStatus]       = useState("idle");
   const [toasts,setToasts]                 = useState([]);
   const [showDeleteConfirm,setShowDeleteConfirm] = useState(false);
@@ -1340,6 +1602,7 @@ export default function Workspace(){
     setIsAIPanelOpen(false);
     setAiResult(found.ai_summary?{summary:found.ai_summary,action_items:found.ai_action_items||[],suggested_title:found.ai_suggested_title||""}:null);
     setAiError(null);
+    setIsQuizOpen(false); setQuizQuestions(null); setQuizError(null);
   }
 
   function handleTitleChange(v)  { setLocalNote(p=>({...p,title:v}));   scheduleAutosave(); }
@@ -1391,12 +1654,24 @@ export default function Workspace(){
 
   async function handleSummarize(){
     if(!localNote) return;
+    setIsQuizOpen(false);
     setIsAIPanelOpen(true); setAiLoading(true); setAiError(null); setAiResult(null);
     try{
       const res=await client.post(`/notes/${localNote.id}/generate-summary`);
       setAiResult(res.data); addToast("success","Summary generated!");
     }catch(err){ setAiError(err.response?.data?.detail||"Could not generate summary."); }
     finally{ setAiLoading(false); }
+  }
+
+  async function handleQuiz(){
+    if(!localNote) return;
+    setIsAIPanelOpen(false);
+    setIsQuizOpen(true); setQuizLoading(true); setQuizError(null); setQuizQuestions(null);
+    try{
+      const res=await client.post(`/notes/${localNote.id}/quiz`);
+      setQuizQuestions(res.data.questions); addToast("success","Quiz ready!");
+    }catch(err){ setQuizError(err.response?.data?.detail||"Could not generate quiz."); }
+    finally{ setQuizLoading(false); }
   }
 
   function applyAITitle(t){ handleTitleChange(t); addToast("info","Title applied!"); }
@@ -1468,7 +1743,7 @@ export default function Workspace(){
             onTitleChange={handleTitleChange} onContentChange={handleContentChange}
             onAddTag={handleAddTag} onRemoveTag={handleRemoveTag}
             onArchive={handleArchive} onDelete={()=>setShowDeleteConfirm(true)}
-            onShare={handleShare} onSummarize={handleSummarize}
+            onShare={handleShare} onSummarize={handleSummarize} onQuiz={handleQuiz}
             shareStatus={shareStatus} showArchived={showArchived}
             user={user} notes={notes} onNewNote={createNote}
           />
@@ -1476,6 +1751,11 @@ export default function Workspace(){
             <AIPanel result={aiResult} loading={aiLoading} error={aiError}
               onClose={()=>setIsAIPanelOpen(false)} onApplyTitle={applyAITitle}
               onRetry={handleSummarize}
+            />
+          )}
+          {isQuizOpen&&(
+            <QuizPanel questions={quizQuestions} loading={quizLoading} error={quizError}
+              onClose={()=>setIsQuizOpen(false)} onRetry={handleQuiz}
             />
           )}
         </div>

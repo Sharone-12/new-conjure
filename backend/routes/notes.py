@@ -284,6 +284,62 @@ def generate_summary(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/{note_id}/quiz")
+def generate_quiz(
+    note_id: str,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    note = (
+        db.query(models.Note)
+        .filter(
+            models.Note.id == note_id,
+            models.Note.user_id == current_user.id,
+            models.Note.deleted_at == None,
+        )
+        .first()
+    )
+    if not note:
+        raise HTTPException(status_code=404, detail="Note not found")
+    if not (note.content or "").strip():
+        raise HTTPException(status_code=400, detail="Add some content before generating a quiz")
+
+    api_key = os.getenv("AI_API_KEY")
+    ai_base_url = os.getenv("AI_BASE_URL")
+    ai_model = os.getenv("AI_MODEL", "llama-3.1-8b-instant")
+    if not api_key:
+        raise HTTPException(status_code=503, detail="AI not configured — add AI_API_KEY to backend/.env")
+
+    try:
+        from openai import OpenAI
+        ac = OpenAI(api_key=api_key, base_url=ai_base_url or None)
+        prompt = (
+            "Generate exactly 3 multiple-choice quiz questions based on the note below.\n"
+            "Return ONLY a JSON array with this exact structure:\n"
+            '[{"question":"...","options":["A","B","C","D"],"answer":0,"explanation":"..."}]\n'
+            "Rules: answer is the 0-based index of the correct option. "
+            "Make questions test real understanding, not trivial recall.\n\n"
+            f"Title: {note.title}\n\n{note.content}"
+        )
+        msg = ac.chat.completions.create(
+            model=ai_model,
+            max_tokens=1024,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        raw = msg.choices[0].message.content.strip()
+        if raw.startswith("```"):
+            parts = raw.split("```")
+            raw = parts[1][4:] if parts[1].startswith("json") else parts[1]
+        questions = json.loads(raw.strip())
+        if not isinstance(questions, list) or len(questions) == 0:
+            raise ValueError("Expected a list of questions")
+        return {"questions": questions}
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail="AI returned invalid JSON — try again")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 class AIActionBody(BaseModel):
     action: str
     selected_text: str

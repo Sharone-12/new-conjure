@@ -8,9 +8,11 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./conjure.db")
 
+is_postgres = DATABASE_URL.startswith("postgresql")
+
 engine = create_engine(
     DATABASE_URL,
-    connect_args={"check_same_thread": False},  # sqlite only
+    connect_args={} if is_postgres else {"check_same_thread": False},
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

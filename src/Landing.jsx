@@ -641,26 +641,6 @@ export default function Landing() {
 
         <div style={{ position:"relative", zIndex:1, textAlign:"center", maxWidth:860, width:"100%" }}>
 
-          {/* badge */}
-          <div className="r0" style={{ marginBottom:28 }}>
-            <span style={{
-              display:"inline-flex", alignItems:"center", gap:8,
-              padding:"8px 18px",
-              background:"rgba(255,255,255,.55)",
-              border:"1px solid rgba(255,255,255,.82)",
-              borderRadius:100, backdropFilter:"blur(14px)",
-              fontFamily:"'Plus Jakarta Sans',sans-serif",
-              fontSize:13, fontWeight:500, color:"rgba(12,10,30,.58)",
-              boxShadow:"inset 0 1px 0 rgba(255,255,255,.9), 0 2px 12px rgba(0,0,0,.05)",
-            }}>
-              <span style={{
-                width:6, height:6, borderRadius:"50%",
-                background:"#7c3aed", boxShadow:"0 0 8px rgba(124,58,237,.55)",
-                display:"inline-block", flexShrink:0,
-              }}/>
-              AI-Powered Notes Workspace
-            </span>
-          </div>
 
           {/* headline — dark, clean, no gradient */}
           <h1 className="hh r1" style={{

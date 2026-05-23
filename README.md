@@ -1,4 +1,4 @@
-# Conjure — AI-Powered Notes Workspace
+# Conjure
 
 An intelligent notes app with AI summarisation, inline AI text actions, public sharing, and a productivity dashboard. Built as a take-home project for Peblo's internship challenge.
 
